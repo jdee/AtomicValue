@@ -7,7 +7,7 @@ CXXFLAGS+=-O3
 
 # Debug
 # CXXFLAGS+=-O0 -g
-# CPPFLAGS+=-DDEBUG
+# CPPFLAGS+=-DDEBUG -DVERBOSE
 
 all: test
 
@@ -15,7 +15,7 @@ test: test.o
 	$(LINK.cc) $(LOADLIBES) $(LDLIBS) $< -o $@
 
 check: test
-	./test
+	./test 1000000
 
 clean:
 	$(RM) test *.o
