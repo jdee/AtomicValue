@@ -1,0 +1,3 @@
+CPPFLAGS=-Iinclude
+
+all: test
