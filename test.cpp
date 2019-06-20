@@ -20,7 +20,7 @@ unsigned long long
 getMaxCount(int argc, char** argv)
 {
     if (argc < 2) return 10000000000;
-    return atoi(argv[1]);
+    return atoll(argv[1]);
 }
 
 string
