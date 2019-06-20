@@ -7,7 +7,7 @@ CXXFLAGS+=-O3
 
 # Debug
 # CXXFLAGS+=-O0 -g
-# CPPFLAGS+=-DDEBUG -DVERBOSE
+# CPPFLAGS+=-DDEBUG
 
 all: test
 

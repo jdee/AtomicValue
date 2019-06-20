@@ -1,6 +1,8 @@
 #include <cstdlib>
+#include <ctime>
 #include <exception>
 #include <iostream>
+#include <sstream>
 #include <sys/time.h>
 
 #include <AtomicValue/AtomicValue.h>
@@ -21,39 +23,55 @@ getMaxCount(int argc, char** argv)
     return atoi(argv[1]);
 }
 
+string
+timestamp(const timeval& tv)
+{
+    tm tm_time;
+    localtime_r(&tv.tv_sec, &tm_time);
+    // YYYY-MM-DD-hh:mm:ss.dddddd
+    char buffer[32];
+    strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", &tm_time);
+
+    char decimal[8];
+    sprintf(decimal, ".%06d", tv.tv_usec);
+    strcat(buffer, decimal);
+    return buffer;
+}
+
 int
 main(int argc, char** argv)
 {
     try
     {
-        FastAtomicReader<unsigned long long> counter;
+        FastAtomicReader<unsigned long long> volatile counter;
 
         cout << "Build type: " << BUILD_TYPE << endl;
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
         cout << "loop count: " << maxCount << endl;
-        cout << "starting test" << endl;
 
         timeval start;
         gettimeofday(&start, NULL);
+        cout << timestamp(start) << " starting test" << endl;
+
         for (unsigned long long j=0; j<maxCount; ++j)
         {
             ++ counter;
-#ifdef VERBOSE
+#ifdef DEBUG
             if (j % (maxCount / 100)) continue;
             cout << ".";
             cout.flush();
-#endif // VERBOSE
+#endif // DEBUG
         }
         timeval end;
         gettimeofday(&end, NULL);
-#ifdef VERBOSE
+#ifdef DEBUG
         cout << endl;
-#endif // VERBOSE
+#endif // DEBUG
 
         auto elapsed(end.tv_sec - start.tv_sec + 1.e-6 * (end.tv_usec - start.tv_usec));
         auto rate(counter / elapsed);
-        cout << "done ✅" << endl;
+        cout << timestamp(end) << " done ✅" << endl;
 
         cout << "final counter value: " << counter << endl;
         cout << "time elapsed: " << elapsed << " s" << endl;
