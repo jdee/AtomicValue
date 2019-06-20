@@ -1,17 +1,21 @@
-INCLUDES=-Iinclude
+CPPFLAGS=-Iinclude
 
 # Release
-CPPFLAGS=$(INCLUDES) -O3 -s
+CXXFLAGS=-O3
 
 # Debug
-# CPPFLAGS=$(INCLUDES) -O0 -g -DDEBUG
+# CXXFLAGS=-O0 -g
+# CPPFLAGS+=-DDEBUG
 
 all: test
+
+test: test.o
+	$(LINK.cc) $(LOADLIBES) $(LDLIBS) $< -o $@
 
 check: test
 	./test
 
 clean:
-	rm -f test
+	$(RM) test *.o
 
-test: include/AtomicValue/AtomicValue.h
+test.o: include/AtomicValue/AtomicValue.h

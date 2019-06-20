@@ -6,6 +6,12 @@
 using namespace AtomicValue;
 using namespace std;
 
+#ifdef DEBUG
+#define BUILD_TYPE "Debug"
+#else
+#define BUILD_TYPE "Release"
+#endif // DEBUG
+
 int
 main(int argc, char** argv)
 {
@@ -13,6 +19,8 @@ main(int argc, char** argv)
 
     timeval start;
     gettimeofday(&start, NULL);
+
+    cout << "Build type: " << BUILD_TYPE << endl;
 
     const unsigned long long maxCount(10000000000);
     for (unsigned long long j=0; j<maxCount; ++j)
