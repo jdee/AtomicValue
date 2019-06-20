@@ -26,11 +26,11 @@ getMaxCount(int argc, char** argv)
 string
 timestamp(const timeval& tv)
 {
-    tm tm_time;
-    localtime_r(&tv.tv_sec, &tm_time);
+    time_t epochTime(tv.tv_sec);
+    tm* tm_time = localtime(&epochTime);
     // YYYY-MM-DD-hh:mm:ss.dddddd
     char buffer[32];
-    strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", &tm_time);
+    strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", tm_time);
 
     char decimal[8];
     sprintf(decimal, ".%06d", tv.tv_usec);
