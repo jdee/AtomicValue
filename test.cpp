@@ -42,6 +42,21 @@ getMaxCount(int argc, char** argv)
     return atoll(argv[1]);
 }
 
+#define LOG(m) \
+    { \
+        ostringstream oss; \
+        oss << m; \
+        cout << timestamp(currentTime()) << " " << oss.str() << endl; \
+    }
+
+inline timeval
+currentTime()
+{
+    timeval now;
+    gettimeofday(&now, NULL);
+    return now;
+}
+
 string
 timestamp(const timeval& tv)
 {
@@ -64,16 +79,12 @@ testLoop(unsigned long long maxCount)
     typedef Template<unsigned long long> Counter_t;
     Counter_t volatile counter;
 
-    cout << endl;
-    cout << "#####" << endl;
-    cout << endl;
+    LOG("");
+    LOG("#####");
+    LOG("");
+    LOG("[" << Metadata<Template>::title << "] starting test");
 
-    timeval start;
-    gettimeofday(&start, NULL);
-    cout << timestamp(start) << " [" << Metadata<Template>::title << "] starting test" << endl;
-
-    // update start time to account for the time needed to report it.
-    gettimeofday(&start, NULL);
+    timeval start(currentTime());
 
     for (unsigned long long j=0; j<maxCount; ++j)
     {
@@ -84,20 +95,19 @@ testLoop(unsigned long long maxCount)
         cout.flush();
 #endif // DEBUG
     }
-    timeval end;
-    gettimeofday(&end, NULL);
+    timeval end(currentTime());
 #ifdef DEBUG
     cout << endl;
 #endif // DEBUG
 
     auto elapsed(end.tv_sec - start.tv_sec + 1.e-6 * (end.tv_usec - start.tv_usec));
     auto rate(counter / elapsed);
-    cout << timestamp(end) << " done ✅" << endl;
 
-    cout << "final counter value: " << counter << endl;
-    cout << "time elapsed: " << elapsed << " s" << endl;
-    cout << "rate: " << rate << "/s" << endl;
-    cout << "per loop: " << 1.e9/rate << " ns" << endl;
+    LOG("done ✅");
+    LOG("final counter value: " << counter);
+    LOG("time elapsed: " << elapsed << " s");
+    LOG("rate: " << rate << "/s");
+    LOG("per loop: " << 1.e9/rate << " ns");
 }
 
 int
@@ -105,11 +115,11 @@ main(int argc, char** argv)
 {
     try
     {
-        cout << "Build type: " << BUILD_TYPE << endl;
+        LOG("Build type: " << BUILD_TYPE);
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
 
-        cout << "loop count: " << maxCount << endl;
+        LOG("loop count: " << maxCount);
 
         testLoop<FastAtomicReader>(maxCount);
         testLoop<MutexWrapper>(maxCount);
@@ -118,12 +128,12 @@ main(int argc, char** argv)
     }
     catch (exception& e)
     {
-        cerr << "Exception in main: " << e.what() << endl;
+        LOG("Exception in main: " << e.what());
         return -1;
     }
     catch (...)
     {
-        cerr << "Unexpected exception in main. Aborting." << endl;
+        LOG("Unexpected exception in main. Aborting.");
         abort();
     }
 }
