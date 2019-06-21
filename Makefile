@@ -3,12 +3,12 @@ CPPFLAGS=-Iinclude
 CXXFLAGS=-std=c++11
 
 # Release
-# CXXFLAGS+=-O3
-# CPPFLAGS+=-Wall -Werror
+CXXFLAGS+=-O3
+CPPFLAGS+=-Wall -Werror
 
 # Debug
-CXXFLAGS+=-O0 -g
-CPPFLAGS+=-DDEBUG
+# CXXFLAGS+=-O0 -g
+# CPPFLAGS+=-DDEBUG
 
 LDLIBS=-lpthread
 
