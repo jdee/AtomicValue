@@ -11,8 +11,10 @@ CXXFLAGS+=-O3
 
 all: test
 
-test: test.o
-	$(LINK.cc) $(LOADLIBES) $(LDLIBS) $< -o $@
+OBJECTS=src/test.o src/timeutil.o
+
+test: $(OBJECTS)
+	$(LINK.cc) $(LOADLIBES) $(LDLIBS) $(OBJECTS) -o $@
 
 check: test
 	./test 1000000
@@ -20,4 +22,8 @@ check: test
 clean:
 	$(RM) test *.o
 
-test.o: include/AtomicValue/AtomicValue.h mutexwrapper.h
+src/test.o: include/AtomicValue/AtomicValue.h \
+	include/timeutil.h \
+	include/MutexWrapper.h
+
+src/timeutil.o: include/timeutil.h

@@ -1,13 +1,12 @@
 #include <cstdlib>
-#include <ctime>
 #include <exception>
 #include <iostream>
 #include <sstream>
-#include <sys/time.h>
 
 #include <AtomicValue/AtomicValue.h>
 
-#include "mutexwrapper.h"
+#include "MutexWrapper.h"
+#include "timeutil.h"
 
 using namespace AtomicValue;
 using namespace std;
@@ -48,29 +47,6 @@ getMaxCount(int argc, char** argv)
         oss << m; \
         cout << timestamp(currentTime()) << " " << oss.str() << endl; \
     }
-
-inline timeval
-currentTime()
-{
-    timeval now;
-    gettimeofday(&now, NULL);
-    return now;
-}
-
-string
-timestamp(const timeval& tv)
-{
-    time_t epochTime(tv.tv_sec);
-    tm* tm_time = localtime(&epochTime);
-    // YYYY-MM-DD-hh:mm:ss.dddddd
-    char buffer[32];
-    strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", tm_time);
-
-    char decimal[8];
-    sprintf(decimal, ".%06d", tv.tv_usec);
-    strcat(buffer, decimal);
-    return buffer;
-}
 
 template <template <class> class Template>
 void
