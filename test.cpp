@@ -7,6 +7,8 @@
 
 #include <AtomicValue/AtomicValue.h>
 
+#include "mutexwrapper.h"
+
 using namespace AtomicValue;
 using namespace std;
 
@@ -15,6 +17,23 @@ using namespace std;
 #else
 #define BUILD_TYPE "Release"
 #endif // DEBUG
+
+template <template <class> class T>
+struct Metadata
+{
+};
+
+template <>
+struct Metadata<FastAtomicReader>
+{
+    static constexpr const char* const title = "AtomicValue";
+};
+
+template <>
+struct Metadata<MutexWrapper>
+{
+    static constexpr const char* const title = "mutex";
+};
 
 unsigned long long
 getMaxCount(int argc, char** argv)
@@ -38,45 +57,59 @@ timestamp(const timeval& tv)
     return buffer;
 }
 
+template <template <class> class Template>
+void
+testLoop(unsigned long long maxCount)
+{
+    typedef Template<unsigned long long> Counter_t;
+    Counter_t volatile counter;
+
+    cout << endl;
+    cout << "#####" << endl;
+    cout << endl;
+
+    timeval start;
+    gettimeofday(&start, NULL);
+    cout << timestamp(start) << " [" << Metadata<Template>::title << "] starting test" << endl;
+
+    for (unsigned long long j=0; j<maxCount; ++j)
+    {
+        ++ counter;
+#ifdef DEBUG
+        if (j % (maxCount / 100)) continue;
+        cout << ".";
+        cout.flush();
+#endif // DEBUG
+    }
+    timeval end;
+    gettimeofday(&end, NULL);
+#ifdef DEBUG
+    cout << endl;
+#endif // DEBUG
+
+    auto elapsed(end.tv_sec - start.tv_sec + 1.e-6 * (end.tv_usec - start.tv_usec));
+    auto rate(counter / elapsed);
+    cout << timestamp(end) << " done ✅" << endl;
+
+    cout << "final counter value: " << counter << endl;
+    cout << "time elapsed: " << elapsed << " s" << endl;
+    cout << "rate: " << rate << "/s" << endl;
+    cout << "per loop: " << 1.e9/rate << " ns" << endl;
+}
+
 int
 main(int argc, char** argv)
 {
     try
     {
-        FastAtomicReader<unsigned long long> volatile counter;
-
         cout << "Build type: " << BUILD_TYPE << endl;
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
+
         cout << "loop count: " << maxCount << endl;
 
-        timeval start;
-        gettimeofday(&start, NULL);
-        cout << timestamp(start) << " starting test" << endl;
-
-        for (unsigned long long j=0; j<maxCount; ++j)
-        {
-            ++ counter;
-#ifdef DEBUG
-            if (j % (maxCount / 100)) continue;
-            cout << ".";
-            cout.flush();
-#endif // DEBUG
-        }
-        timeval end;
-        gettimeofday(&end, NULL);
-#ifdef DEBUG
-        cout << endl;
-#endif // DEBUG
-
-        auto elapsed(end.tv_sec - start.tv_sec + 1.e-6 * (end.tv_usec - start.tv_usec));
-        auto rate(counter / elapsed);
-        cout << timestamp(end) << " done ✅" << endl;
-
-        cout << "final counter value: " << counter << endl;
-        cout << "time elapsed: " << elapsed << " s" << endl;
-        cout << "rate: " << rate << "/s" << endl;
-        cout << "per loop: " << 1.e9/rate << " ns" << endl;
+        testLoop<FastAtomicReader>(maxCount);
+        testLoop<MutexWrapper>(maxCount);
 
         return 0;
     }

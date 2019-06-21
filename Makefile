@@ -20,4 +20,4 @@ check: test
 clean:
 	$(RM) test *.o
 
-test.o: include/AtomicValue/AtomicValue.h
+test.o: include/AtomicValue/AtomicValue.h mutexwrapper.h
