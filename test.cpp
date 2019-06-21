@@ -72,6 +72,9 @@ testLoop(unsigned long long maxCount)
     gettimeofday(&start, NULL);
     cout << timestamp(start) << " [" << Metadata<Template>::title << "] starting test" << endl;
 
+    // update start time to account for the time needed to report it.
+    gettimeofday(&start, NULL);
+
     for (unsigned long long j=0; j<maxCount; ++j)
     {
         ++ counter;

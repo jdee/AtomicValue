@@ -61,7 +61,6 @@ public:
 
     operator T() const volatile
     {
-        ScopeLock _l(m_mutex);
         return get();
     }
 
