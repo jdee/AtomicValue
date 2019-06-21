@@ -27,6 +27,7 @@ clean:
 src/benchmark.o: include/AtomicValue/AtomicValue.h \
 	include/timeutil.h \
 	include/Metadata.h \
-	include/MutexWrapper.h
+	include/MutexWrapper.h \
+	include/MySTLAtomic.h
 
 src/timeutil.o: include/timeutil.h

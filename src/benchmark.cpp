@@ -11,6 +11,7 @@
 
 #include "Metadata.h"
 #include "MutexWrapper.h"
+#include "MySTLAtomic.h"
 #include "timeutil.h"
 
 using namespace AtomicValue;
