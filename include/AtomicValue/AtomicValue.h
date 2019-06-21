@@ -132,7 +132,6 @@ public:
         ++ m_lockCounter;
         m_data = data;
         m_lockCounter = 0;
-        return *this;
     }
 
     operator T() const volatile { return get(); }
@@ -231,7 +230,6 @@ public:
         ++ m_lockCounter;
         m_data += data;
         m_lockCounter = 0;
-        return;
     }
 
     FastAtomicReader& operator=(T data) { set(data); return *this; }
