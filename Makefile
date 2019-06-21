@@ -9,20 +9,20 @@ CXXFLAGS+=-O3
 # CXXFLAGS+=-O0 -g
 # CPPFLAGS+=-DDEBUG
 
-all: test
+all: benchmark
 
-OBJECTS=src/test.o src/timeutil.o
+OBJECTS=src/benchmark.o src/timeutil.o
 
-test: $(OBJECTS)
+benchmark: $(OBJECTS)
 	$(LINK.cc) $(LOADLIBES) $(LDLIBS) $(OBJECTS) -o $@
 
-check: test
-	./test 1000000
+check: benchmark
+	./benchmark 1000000
 
 clean:
-	$(RM) test *.o
+	$(RM) benchmark *.o
 
-src/test.o: include/AtomicValue/AtomicValue.h \
+src/benchmark.o: include/AtomicValue/AtomicValue.h \
 	include/timeutil.h \
 	include/MutexWrapper.h
 
