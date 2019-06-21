@@ -6,6 +6,7 @@
 class ScopeLock
 {
 public:
+    explicit
     ScopeLock(pthread_mutex_t volatile& mutex) :
         m_mutex(const_cast<pthread_mutex_t&>(mutex))
     {
