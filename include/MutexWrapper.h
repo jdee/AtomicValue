@@ -60,12 +60,6 @@ public:
         return m_data;
     }
 
-    T get() const
-    {
-        ScopeLock _l(m_mutex);
-        return m_data;
-    }
-
     void operator++() volatile
     {
         ScopeLock _l(m_mutex);
@@ -80,11 +74,6 @@ public:
     }
 
     operator T() const volatile
-    {
-        return get();
-    }
-
-    operator T() const
     {
         return get();
     }
