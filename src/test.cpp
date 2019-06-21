@@ -5,6 +5,7 @@
 
 #include <AtomicValue/AtomicValue.h>
 
+#include "Metadata.h"
 #include "MutexWrapper.h"
 #include "timeutil.h"
 
@@ -16,30 +17,6 @@ using namespace std;
 #else
 #define BUILD_TYPE "Release"
 #endif // DEBUG
-
-template <template <class> class T>
-struct Metadata
-{
-};
-
-template <>
-struct Metadata<FastAtomicReader>
-{
-    static constexpr const char* const title = "AtomicValue";
-};
-
-template <>
-struct Metadata<MutexWrapper>
-{
-    static constexpr const char* const title = "mutex";
-};
-
-unsigned long long
-getMaxCount(int argc, char** argv)
-{
-    if (argc < 2) return 10000000000;
-    return atoll(argv[1]);
-}
 
 #define LOG(m) \
     { \
@@ -58,10 +35,9 @@ testLoop(unsigned long long maxCount)
     LOG("");
     LOG("#####");
     LOG("");
-    LOG("[" << Metadata<Template>::title << "] starting test");
+    LOG("[" << Metadata<Template>::testTitle << "] starting test");
 
     timeval start(currentTime());
-
     for (unsigned long long j=0; j<maxCount; ++j)
     {
         ++ counter;
@@ -84,6 +60,13 @@ testLoop(unsigned long long maxCount)
     LOG("time elapsed: " << elapsed << " s");
     LOG("rate: " << rate << "/s");
     LOG("per loop: " << 1.e9/rate << " ns");
+}
+
+unsigned long long
+getMaxCount(int argc, char** argv)
+{
+    if (argc < 2) return 10000000000;
+    return atoll(argv[1]);
 }
 
 int
