@@ -63,3 +63,58 @@ AtomicValue::FastAtomicReader<unsigned int> counter(0);
 cout << "counter = " << counter << endl;
 
 ```
+
+## Use of volatile
+
+A FastAtomicReader or FastAtomicWriter may be declared `volatile`. However, note
+that certain operators and member functions that would ordinarily return
+references to `*this` would have to return references to volatiles. This
+generates warnings from G++ in calling code in situations like this:
+
+```cpp
+FastAtomicReader<int> volatile x;
+x = 1;
+```
+
+The return type of the assignment would be `FastAtomicReader<int> volatile&`.
+The return value is unread, which generates a warning at the second line. The
+warning can't be silenced in the AtomicValue source code. As a result, the
+volatile versions of these functions and operators do not return a value, e.g.
+
+```cpp
+FastAtomicReader& set(T data);
+void set(T data) volatile;
+```
+
+So:
+
+```cpp
+FastAtomicReader<int> x;
+# compiles
+cout << "x = " << x.set(1) << endl;
+```
+
+but:
+
+```cpp
+FastAtomicReader<int> volatile x;
+# does not compile
+cout << "x = " << x.set(1) << endl;
+```
+
+Instead:
+
+```cpp
+FastAtomicReader<int> volatile x;
+# compiles
+x.set(1);
+cout << "x = " << x << endl;
+```
+
+Operators/functions that return void on volatile objects:
+
+- `set(T)`
+- `operator+=(int)`
+- `operator++()`
+- `operator=(T)`
+- `operator=(const FastAtomicReader/Writer&)`
