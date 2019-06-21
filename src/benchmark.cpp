@@ -1,7 +1,11 @@
+#include <cerrno>
 #include <cstdlib>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include <sys/stat.h>
 
 #include <AtomicValue/AtomicValue.h>
 
@@ -24,6 +28,24 @@ using namespace std;
         oss << m; \
         cout << timestamp(currentTime()) << " " << oss.str() << endl; \
     }
+
+void
+logBanner()
+{
+    struct stat sb;
+    if (stat("assets/AtomicValue.asc", &sb) && errno == ENOENT)
+    {
+        LOG("<error rendering ASCII art>");
+        return;
+    }
+
+    ifstream asciiArt("assets/AtomicValue.asc");
+    char line[256];
+    while (asciiArt.getline(line, 255))
+    {
+        LOG(line);
+    }
+}
 
 template <template <class> class Template>
 void
@@ -74,6 +96,8 @@ main(int argc, char** argv)
 {
     try
     {
+        logBanner();
+        LOG("");
         LOG("Build type: " << BUILD_TYPE);
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
