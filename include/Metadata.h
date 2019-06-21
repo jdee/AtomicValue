@@ -9,7 +9,7 @@ template <class> class FastAtomicWriter;
 
 template <class> class MutexWrapper;
 
-template <template <class> class T>
+template <template <class> class>
 struct Metadata
 {
 };

@@ -1,20 +1,19 @@
 CPPFLAGS=-Iinclude
-
 CXXFLAGS=-std=c++11
 
 # Release
-CXXFLAGS+=-O3
 CPPFLAGS+=-Wall -Werror
+CXXFLAGS+=-O3
 
 # Debug
-# CXXFLAGS+=-O0 -g
 # CPPFLAGS+=-DDEBUG
+# CXXFLAGS+=-O0 -g
 
 LDLIBS=-lpthread
 
-all: benchmark
-
 OBJECTS=src/benchmark.o src/timeutil.o
+
+all: benchmark
 
 benchmark: $(OBJECTS)
 	$(LINK.cc) $(OBJECTS) $(LOADLIBES) $(LDLIBS) -o $@
@@ -27,6 +26,7 @@ clean:
 
 src/benchmark.o: include/AtomicValue/AtomicValue.h \
 	include/timeutil.h \
+	include/Metadata.h \
 	include/MutexWrapper.h
 
 src/timeutil.o: include/timeutil.h
