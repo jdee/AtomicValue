@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "timeutil.h"
 
 std::string
@@ -10,7 +12,7 @@ timestamp(const timeval& tv)
     strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", tm_time);
 
     char decimal[8];
-    sprintf(decimal, ".%06d", tv.tv_usec);
+    sprintf(decimal, ".%06ld", tv.tv_usec);
     strcat(buffer, decimal);
     return buffer;
 }
