@@ -47,7 +47,19 @@ public:
         m_data = data;
     }
 
+    void set(T data)
+    {
+        ScopeLock _l(m_mutex);
+        m_data = data;
+    }
+
     T get() const volatile
+    {
+        ScopeLock _l(m_mutex);
+        return m_data;
+    }
+
+    T get() const
     {
         ScopeLock _l(m_mutex);
         return m_data;
@@ -60,7 +72,19 @@ public:
         return *this;
     }
 
+    MutexWrapper& operator++()
+    {
+        ScopeLock _l(m_mutex);
+        ++m_data;
+        return *this;
+    }
+
     operator T() const volatile
+    {
+        return get();
+    }
+
+    operator T() const
     {
         return get();
     }
