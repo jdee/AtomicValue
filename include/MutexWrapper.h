@@ -65,11 +65,10 @@ public:
         return m_data;
     }
 
-    MutexWrapper volatile& operator++() volatile
+    void operator++() volatile
     {
         ScopeLock _l(m_mutex);
         ++m_data;
-        return *this;
     }
 
     MutexWrapper& operator++()

@@ -89,7 +89,30 @@ public:
         return data;
     }
 
-    FastAtomicReader volatile& set(T data) volatile
+    FastAtomicReader& set(T data)
+    {
+        timespec wait;
+        wait.tv_sec = 0;
+        wait.tv_nsec = 10;
+
+        int loopCount = 0;
+
+        while (m_lockCounter > 0 && loopCount < 5)
+        {
+            nanosleep(&wait, 0);
+            ++ loopCount;
+        }
+
+        if (m_exiting) return *this;
+
+        // prevent other writers from colliding, at least
+        ++ m_lockCounter;
+        m_data = data;
+        m_lockCounter = 0;
+        return *this;
+    }
+
+    void set(T data) volatile
     {
         timespec wait;
         wait.tv_sec = 0;
@@ -115,7 +138,7 @@ public:
     operator T() const volatile { return get(); }
 
     // atomic read-write operation
-    FastAtomicReader volatile& operator ++() volatile
+    FastAtomicReader& operator ++()
     {
         timespec wait;
         wait.tv_sec = 0;
@@ -138,9 +161,32 @@ public:
         return *this;
     }
 
+    // atomic read-write operation
+    void operator ++() volatile
+    {
+        timespec wait;
+        wait.tv_sec = 0;
+        wait.tv_nsec = 10;
+
+        int loopCount = 0;
+
+        while (m_lockCounter > 0 && loopCount < 5)
+        {
+            nanosleep(&wait, 0);
+            ++ loopCount;
+        }
+
+        if (m_exiting) return;
+
+        // prevent other writers from colliding, at least
+        ++ m_lockCounter;
+        ++ m_data;
+        m_lockCounter = 0;
+    }
+
     // won't work with floating-point types?
     // atomic read-write operation
-    FastAtomicReader volatile& operator+=(int data) volatile
+    FastAtomicReader& operator+=(int data)
     {
         timespec wait;
         wait.tv_sec = 0;
@@ -163,8 +209,36 @@ public:
         return *this;
     }
 
-    FastAtomicReader volatile& operator=(T data) volatile { set(data); return *this; }
-    FastAtomicReader volatile& operator=(FastAtomicReader const& o) volatile { set(o.get()); return *this; }
+    // won't work with floating-point types?
+    // atomic read-write operation
+    void operator+=(int data) volatile
+    {
+        timespec wait;
+        wait.tv_sec = 0;
+        wait.tv_nsec = 10;
+
+        int loopCount = 0;
+
+        while (m_lockCounter > 0 && loopCount < 5)
+        {
+            nanosleep(&wait, 0);
+            ++ loopCount;
+        }
+
+        if (m_exiting) return;
+
+        // prevent other writers from colliding, at least
+        ++ m_lockCounter;
+        m_data += data;
+        m_lockCounter = 0;
+        return;
+    }
+
+    FastAtomicReader& operator=(T data) { set(data); return *this; }
+    FastAtomicReader& operator=(FastAtomicReader const& o) { set(o.get()); return *this; }
+
+    void operator=(T data) volatile { set(data); }
+    void operator=(FastAtomicReader const& o) volatile { set(o.get()); }
 
     // won't compile if T is not a pointer type
     T operator->() const volatile { return get(); }
@@ -233,7 +307,7 @@ public:
         return m_data;
     }
 
-    FastAtomicWriter volatile& set(T data) volatile
+    FastAtomicWriter& set(T data)
     {
         ++ m_lockCounter;
         m_data = data;
@@ -241,19 +315,35 @@ public:
         return *this;
     }
 
+    void set(T data) volatile
+    {
+        ++ m_lockCounter;
+        m_data = data;
+        -- m_lockCounter;
+    }
+
     operator T() const volatile { return get(); }
 
-    FastAtomicWriter volatile& operator=(T data) volatile { set(data); return *this; }
-    FastAtomicWriter volatile& operator=(FastAtomicWriter const& o) volatile { set(o.get()); return *this; }
-    FastAtomicWriter volatile& operator ++() volatile
+    FastAtomicWriter& operator=(T data) { set(data); return *this; }
+    FastAtomicWriter& operator=(FastAtomicWriter const& o) { set(o.get()); return *this; }
+    FastAtomicWriter& operator ++()
     {
         T data = get();
         return set(++data);
     }
 
+    void operator=(T data) volatile { set(data); }
+    void operator=(FastAtomicWriter const& o) volatile { set(o.get()); }
+    void operator ++() volatile
+    {
+        T data = get();
+        set(++data);
+    }
+
     // won't work with floating-point types?
     // read-write operation
-    FastAtomicWriter volatile& operator+=(int data) volatile { set(get() + data); return *this; }
+    FastAtomicWriter& operator+=(int data) { set(get() + data); return *this; }
+    void operator+=(int data) volatile { set(get() + data); }
 
     // won't compile if T is not a pointer type
     T operator->() const volatile { return get(); }
