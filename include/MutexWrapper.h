@@ -47,10 +47,11 @@ public:
         m_data = data;
     }
 
-    void set(T data)
+    MutexWrapper& set(T data)
     {
         ScopeLock _l(m_mutex);
         m_data = data;
+        return *this;
     }
 
     T get() const volatile
