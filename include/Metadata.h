@@ -17,7 +17,13 @@ struct Metadata
 template <>
 struct Metadata<AtomicValue::FastAtomicReader>
 {
-    static constexpr const char* const testTitle = "AtomicValue";
+    static constexpr const char* const testTitle = "FastAtomicReader";
+};
+
+template <>
+struct Metadata<AtomicValue::FastAtomicWriter>
+{
+    static constexpr const char* const testTitle = "FastAtomicWriter";
 };
 
 template <>

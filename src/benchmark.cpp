@@ -105,6 +105,7 @@ main(int argc, char** argv)
         LOG("loop count: " << maxCount);
 
         testLoop<FastAtomicReader>(maxCount);
+        testLoop<FastAtomicWriter>(maxCount);
         testLoop<MutexWrapper>(maxCount);
 
         return 0;

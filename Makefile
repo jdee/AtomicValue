@@ -19,7 +19,7 @@ OBJECTS=src/benchmark.o src/timeutil.o
 benchmark: $(OBJECTS)
 	$(LINK.cc) $(OBJECTS) $(LOADLIBES) $(LDLIBS) -o $@
 
-check: benchmark
+check: all
 	./benchmark 1000000
 
 clean:
