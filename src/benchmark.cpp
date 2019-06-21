@@ -106,6 +106,7 @@ main(int argc, char** argv)
 
         testLoop<FastAtomicReader>(maxCount);
         testLoop<FastAtomicWriter>(maxCount);
+        testLoop<MySTLAtomic>(maxCount);
         testLoop<MutexWrapper>(maxCount);
 
         return 0;
