@@ -32,10 +32,10 @@ testLoop(unsigned long long maxCount)
     typedef Template<unsigned long long> Counter_t;
     Counter_t volatile counter;
 
-    LOG("");
     LOG("#####");
-    LOG("");
-    LOG("[" << Metadata<Template>::testTitle << "] starting test");
+    LOG("##### " << Metadata<Template>::testTitle);
+    LOG("#####");
+    LOG("starting test");
 
     timeval start(currentTime());
     for (unsigned long long j=0; j<maxCount; ++j)
