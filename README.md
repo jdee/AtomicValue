@@ -8,7 +8,25 @@ _  ___ / /_ / /_/ /  / / / / /  / / /__ __ |/ / / /_/ /_  / / /_/ //  __/
 
 # AtomicValue
 
-FastAtomicReader and FastAtomicWriter templates for C++.
+FastAtomicReader and FastAtomicWriter templates for C++. Currently limited to
+POSIX. Tested on iOS, macOS and Ubuntu. Limited features. Highly unsafe.
+
+FastAtomicReader and FastAtomicWriter are lightweight, asymmetric
+synchronization primitives similar to std::atomic. In each case, either read
+or write operations are undelayable. Locking is accomplished using only an
+integer counter. The FastAtomicReader template provides a shared read lock, but
+not an exclusive write lock. FastAtomicWriter is the reverse. It provides a
+shared write lock with no read lock (and hence is best used when only one
+thread will ever perform write operations, and reads are few).
+
+While theoretically unsafe, these templates have been in use in an iOS app on
+the App Store for five years without event. They are prone to a peculiar kind
+of deadlock, but that was addressed before the app was launched. Since then,
+they have performed admirably in a highly latency-sensitve app where they are
+used extensively.
+
+They consistenly beat std::atomic in benchmarking by a significant factor, but
+at the cost of safety. Use with care!
 
 ## Benchmark
 
@@ -108,7 +126,7 @@ So:
 
 ```cpp
 FastAtomicReader<int> x;
-# compiles
+// compiles
 cout << "x = " << x.set(1) << endl;
 ```
 
@@ -116,7 +134,7 @@ but:
 
 ```cpp
 FastAtomicReader<int> volatile x;
-# does not compile
+// does not compile
 cout << "x = " << x.set(1) << endl;
 ```
 
@@ -124,7 +142,7 @@ Instead:
 
 ```cpp
 FastAtomicReader<int> volatile x;
-# compiles
+// compiles
 x.set(1);
 cout << "x = " << x << endl;
 ```
