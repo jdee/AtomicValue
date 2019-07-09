@@ -19,8 +19,9 @@ not an exclusive write lock. FastAtomicWriter is the reverse. It provides a
 shared write lock with no read lock (and hence is best used when only one
 thread will ever perform write operations, and reads are few).
 
-While theoretically unsafe, these templates have been in use in an iOS app on
-the App Store for five years without event. They are prone to a peculiar kind
+While theoretically unsafe, these templates have been in use in [an iOS app on
+the App Store](https://itunes.apple.com/us/app/cpyn/id929721548?mt=8) for five
+years without event. They are prone to a peculiar kind
 of deadlock, but that was addressed before the app was launched. Since then,
 they have performed admirably in a highly latency-sensitve app where they are
 used extensively.
@@ -91,6 +92,8 @@ c++ -std=c++11 -O3 -Iinclude -Wall -Werror   src/benchmark.o src/timeutil.o  -lp
 ```cpp
 #include <iostream>
 #include <AtomicValue/AtomicValue.h>
+
+using namespace std;
 
 AtomicValue::FastAtomicReader<unsigned int> counter(0);
 
