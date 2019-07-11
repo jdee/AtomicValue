@@ -30,7 +30,8 @@ src/benchmark.o: Makefile \
 	include/Metadata.h \
 	include/MutexWrapper.h \
 	include/MySTLAtomic.h \
-	include/TestLoop.h
+	include/TestLoop.h \
+	include/static_assert.h
 
 src/log.o: Makefile \
 	include/log.h \

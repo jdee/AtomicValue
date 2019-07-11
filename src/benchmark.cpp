@@ -38,16 +38,16 @@ main(int argc, char** argv)
         LOG("Volatile counters");
 #endif // VOLATILE_COUNTER
 
-        const unsigned long long maxCount(getMaxCount(argc, argv));
+        auto const maxCount(getMaxCount(argc, argv));
 
         LOG("total loop count: " << maxCount);
 
-        auto const numPerLoop(maxCount/10);
+        auto const iterations(100);
 
-        TestLoop<FastAtomicReader>::loop(10, numPerLoop);
-        TestLoop<FastAtomicWriter>::loop(10, numPerLoop);
-        TestLoop<MySTLAtomic>::loop(10, numPerLoop);
-        TestLoop<MutexWrapper>::loop(10, numPerLoop);
+        TestLoop<FastAtomicReader, iterations>::loop(maxCount);
+        TestLoop<FastAtomicWriter, iterations>::loop(maxCount);
+        TestLoop<MySTLAtomic, iterations>::loop(maxCount);
+        TestLoop<MutexWrapper, iterations>::loop(maxCount);
 
         return 0;
     }

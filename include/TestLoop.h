@@ -5,6 +5,7 @@
 
 #include "Metadata.h"
 #include "log.h"
+#include "static_assert.h"
 #include "timeutil.h"
 
 #ifdef VOLATILE_COUNTERS
@@ -13,55 +14,67 @@
 #define VOLATILE
 #endif // VOLATILE_COUNTERS
 
-template <template <class> class Template>
+template <template <class> class Template, unsigned int iterations>
 struct
 TestLoop
 {
     typedef Template<unsigned long long> Counter_t;
 
-    static void loop(unsigned int numLoops, unsigned long long loopCount)
+    static void loop(unsigned long long totalLoops)
     {
+        auto const loopCount(totalLoops/iterations);
+
         LOG("#####");
         LOG("##### " << Metadata<Template>::testTitle);
         LOG("#####");
-        LOG("starting test (" << numLoops << " x " << loopCount << ")");
+        LOG("starting test (" << iterations << " x " << loopCount << ")");
 
-        double total(0);
+        double totalTime(0);
         double totalSquare(0);
-        for (unsigned int i=0; i<numLoops; ++i)
+        for (unsigned int i=0; i<iterations; ++i)
         {
-            auto const start(currentTime());
-            run(loopCount);
-            auto const end(currentTime());
-            auto const elapsed(end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec);
-            total += elapsed;
+            auto const elapsed(run(loopCount));
+            totalTime += elapsed;
             totalSquare += elapsed * elapsed;
         }
 
         LOG("done ✅");
-        LOG("time elapsed: " << total << " s");
-        if (total > 0)
+        LOG("time elapsed: " << totalTime << " s");
+        if (totalTime > 0)
         {
-            auto const totalLoops(numLoops * loopCount);
-            auto const rate(totalLoops / total);
-            // statistical errors
-            auto const meanTime(total / numLoops);
-            auto const rmsTime(sqrt(totalSquare / numLoops - meanTime * meanTime));
-            auto const relativeError(rmsTime/meanTime);
-            auto const rateError(rate * relativeError);
-            auto const period(1./rate);
-            auto const periodError(period * relativeError);
+            // ----- statistical errors -----
 
-            LOG("rate: " << rate << " ± " << rateError << "/s");
-            LOG("per loop: " << NsPerSec * period << " ± " << NsPerSec * periodError << " ns");
+            // mean time per iteration
+            auto const meanTime(totalTime / iterations);
+            // RMS deviation
+            auto const rmsTime(sqrt(totalSquare / iterations - meanTime * meanTime));
+            // SD/RMS
+            auto const sdRatio(sqrt(1.*iterations/(iterations-1)));
+            // standard deviation
+            auto const sigma(sdRatio * rmsTime);
+            // everything scales to the mean time
+            auto const relativeSigma(sigma/meanTime);
+            // error on mean time
+            auto const relativeError(rmsTime/meanTime/sqrt(1. * iterations));
+
+            auto const meanRate(totalLoops / totalTime);
+            auto const rateError(meanRate * relativeError);
+            auto const rateSigma(meanRate * relativeSigma);
+
+            auto const meanPeriod(1./meanRate);
+            auto const periodError(meanPeriod * relativeError);
+            auto const periodSigma(meanPeriod * relativeSigma);
+
+            LOG("rate: " << meanRate << " ± " << rateError << " Hz (σ = " << rateSigma << " Hz)");
+            LOG("per loop: " << NsPerSec * meanPeriod << " ± " << NsPerSec * periodError << " ns (σ = " << NsPerSec * periodSigma << " ns)");
         }
     }
 
 protected:
-    static void run(unsigned long long maxCount)
+    static double run(unsigned long long maxCount)
     {
         Counter_t VOLATILE counter;
-
+        auto const start(currentTime());
         for (unsigned long long j=0; j<maxCount; ++j)
         {
             ++ counter;
@@ -71,9 +84,11 @@ protected:
             cout.flush();
 #endif // DEBUG
         }
+        auto const end(currentTime());
 #ifdef DEBUG
         cout << endl;
 #endif // DEBUG
+        return end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec;
     }
 };
 
