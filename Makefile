@@ -1,4 +1,4 @@
-CPPFLAGS=-Iinclude
+CPPFLAGS=-Iinclude # -DVOLATILE_COUNTERS
 CXXFLAGS=-std=c++11
 
 # Release
@@ -23,14 +23,17 @@ check: all
 clean:
 	$(RM) benchmark src/*.o
 
-src/benchmark.o: include/AtomicValue/AtomicValue.h \
+src/benchmark.o: Makefile \
+	include/AtomicValue/AtomicValue.h \
 	include/log.h \
 	include/timeutil.h \
 	include/Metadata.h \
 	include/MutexWrapper.h \
 	include/MySTLAtomic.h
 
-src/log.o: include/log.h \
+src/log.o: Makefile \
+	include/log.h \
 	include/timeutil.h
 
-src/timeutil.o: include/timeutil.h
+src/timeutil.o: Makefile \
+	include/timeutil.h

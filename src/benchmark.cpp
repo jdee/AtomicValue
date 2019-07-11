@@ -19,6 +19,12 @@ using namespace std;
 #define BUILD_TYPE "Release"
 #endif // DEBUG
 
+#ifdef VOLATILE_COUNTERS
+#define VOLATILE volatile
+#else
+#define VOLATILE
+#endif // VOLATILE_COUNTER
+
 template <template <class> class Template>
 struct
 TestLoop
@@ -29,7 +35,7 @@ TestLoop
     static void run(unsigned long long maxCount)
     {
         typedef Template<unsigned long long> Counter_t;
-        Counter_t volatile counter;
+        Counter_t VOLATILE counter;
 
         LOG("#####");
         LOG("##### " << Metadata<Template>::testTitle);
@@ -84,6 +90,9 @@ main(int argc, char** argv)
         logBanner();
         LOG("");
         LOG("Build type: " << BUILD_TYPE);
+#ifdef VOLATILE_COUNTERS
+        LOG("Volatile counters");
+#endif // VOLATILE_COUNTER
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
 
