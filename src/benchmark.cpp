@@ -40,12 +40,14 @@ main(int argc, char** argv)
 
         const unsigned long long maxCount(getMaxCount(argc, argv));
 
-        LOG("loop count: " << maxCount);
+        LOG("total loop count: " << maxCount);
 
-        TestLoop<FastAtomicReader>::run(maxCount);
-        TestLoop<FastAtomicWriter>::run(maxCount);
-        TestLoop<MySTLAtomic>::run(maxCount);
-        TestLoop<MutexWrapper>::run(maxCount);
+        auto const numPerLoop(maxCount/10);
+
+        TestLoop<FastAtomicReader>::loop(10, numPerLoop);
+        TestLoop<FastAtomicWriter>::loop(10, numPerLoop);
+        TestLoop<MySTLAtomic>::loop(10, numPerLoop);
+        TestLoop<MutexWrapper>::loop(10, numPerLoop);
 
         return 0;
     }

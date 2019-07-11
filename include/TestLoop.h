@@ -17,17 +17,51 @@ template <template <class> class Template>
 struct
 TestLoop
 {
-    static void run(unsigned long long maxCount)
-    {
-        typedef Template<unsigned long long> Counter_t;
-        Counter_t VOLATILE counter;
+    typedef Template<unsigned long long> Counter_t;
 
+    static void loop(unsigned int numLoops, unsigned long long loopCount)
+    {
         LOG("#####");
         LOG("##### " << Metadata<Template>::testTitle);
         LOG("#####");
-        LOG("starting test");
+        LOG("starting test (" << numLoops << " x " << loopCount << ")");
 
-        auto const start(currentTime());
+        double total(0);
+        double totalSquare(0);
+        for (unsigned int i=0; i<numLoops; ++i)
+        {
+            auto const start(currentTime());
+            run(loopCount);
+            auto const end(currentTime());
+            auto const elapsed(end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec);
+            total += elapsed;
+            totalSquare += elapsed * elapsed;
+        }
+
+        LOG("done ✅");
+        LOG("time elapsed: " << total << " s");
+        if (total > 0)
+        {
+            auto const totalLoops(numLoops * loopCount);
+            auto const rate(totalLoops / total);
+            // statistical errors
+            auto const meanTime(total / numLoops);
+            auto const rmsTime(sqrt(totalSquare / numLoops - meanTime * meanTime));
+            auto const relativeError(rmsTime/meanTime);
+            auto const rateError(rate * relativeError);
+            auto const period(1./rate);
+            auto const periodError(period * relativeError);
+
+            LOG("rate: " << rate << " ± " << rateError << "/s");
+            LOG("per loop: " << NsPerSec * period << " ± " << NsPerSec * periodError << " ns");
+        }
+    }
+
+protected:
+    static void run(unsigned long long maxCount)
+    {
+        Counter_t VOLATILE counter;
+
         for (unsigned long long j=0; j<maxCount; ++j)
         {
             ++ counter;
@@ -37,26 +71,9 @@ TestLoop
             cout.flush();
 #endif // DEBUG
         }
-        auto const end(currentTime());
 #ifdef DEBUG
         cout << endl;
 #endif // DEBUG
-
-        auto const elapsed(end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec);
-
-        LOG("done ✅");
-        LOG("final counter value: " << counter);
-        LOG("time elapsed: " << elapsed << " s");
-        if (elapsed > 0)
-        {
-            auto const rate(counter / elapsed);
-            // statistical errors
-            auto const rateError(sqrt(1. * counter) / elapsed);
-            auto const periodError(NsPerSec * rateError / rate / rate);
-
-            LOG("rate: " << rate << " ± " << rateError << "/s");
-            LOG("per loop: " << NsPerSec/rate << " ± " << periodError << " ns");
-        }
     }
 };
 
