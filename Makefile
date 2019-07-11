@@ -29,7 +29,8 @@ src/benchmark.o: Makefile \
 	include/timeutil.h \
 	include/Metadata.h \
 	include/MutexWrapper.h \
-	include/MySTLAtomic.h
+	include/MySTLAtomic.h \
+	include/TestLoop.h
 
 src/log.o: Makefile \
 	include/log.h \

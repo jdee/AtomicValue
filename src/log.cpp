@@ -5,6 +5,8 @@
 
 #include "log.h"
 
+using namespace std;
+
 void
 logBanner()
 {
@@ -15,7 +17,7 @@ logBanner()
         return;
     }
 
-    std::ifstream asciiArt("assets/AtomicValue.asc");
+    ifstream asciiArt("assets/AtomicValue.asc");
     char line[256];
     while (asciiArt.getline(line, 255))
     {

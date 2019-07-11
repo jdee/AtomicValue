@@ -1,14 +1,14 @@
 #include <algorithm>
-#include <cmath>
 #include <cstdlib>
 #include <exception>
 
 #include <AtomicValue/AtomicValue.h>
 
-#include "log.h"
-#include "Metadata.h"
 #include "MutexWrapper.h"
 #include "MySTLAtomic.h"
+#include "TestLoop.h"
+#include "log.h"
+#include "timeutil.h"
 
 using namespace AtomicValue;
 using namespace std;
@@ -18,62 +18,6 @@ using namespace std;
 #else
 #define BUILD_TYPE "Release"
 #endif // DEBUG
-
-#ifdef VOLATILE_COUNTERS
-#define VOLATILE volatile
-#else
-#define VOLATILE
-#endif // VOLATILE_COUNTER
-
-template <template <class> class Template>
-struct
-TestLoop
-{
-    static constexpr auto const NsPerSec = 1.e9;
-    static constexpr auto const UsPerSec = 1.e6;
-
-    static void run(unsigned long long maxCount)
-    {
-        typedef Template<unsigned long long> Counter_t;
-        Counter_t VOLATILE counter;
-
-        LOG("#####");
-        LOG("##### " << Metadata<Template>::testTitle);
-        LOG("#####");
-        LOG("starting test");
-
-        timeval const start(currentTime());
-        for (unsigned long long j=0; j<maxCount; ++j)
-        {
-            ++ counter;
-#ifdef DEBUG
-            if (j % (maxCount / 100)) continue;
-            cout << ".";
-            cout.flush();
-#endif // DEBUG
-        }
-        timeval const end(currentTime());
-#ifdef DEBUG
-        cout << endl;
-#endif // DEBUG
-
-        auto const elapsed(end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec);
-        auto const rate(counter / elapsed);
-
-        // statistical errors
-        auto const rateError(sqrt(1. * counter) / elapsed);
-        auto const periodError(NsPerSec * rateError / rate / rate);
-
-        LOG("done ✅");
-        LOG("final counter value: " << counter);
-        LOG("time elapsed: " << elapsed << " s");
-        if (isfinite(rate))
-        {
-            LOG("rate: " << rate << " ± " << rateError << "/s");
-            LOG("per loop: " << NsPerSec/rate << " ± " << periodError << " ns");
-        }
-    }
-};
 
 unsigned long long
 getMaxCount(int argc, char** argv)

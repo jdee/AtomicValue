@@ -3,17 +3,14 @@
 
 #include <ctime>
 #include <string>
-#include <sys/time.h>
 
-inline timeval
-currentTime()
-{
-    timeval now;
-    gettimeofday(&now, NULL);
-    return now;
-}
+extern timeval
+currentTime();
 
-std::string
+extern std::string
 timestamp(const timeval& tv);
+
+constexpr auto const NsPerSec = 1.e9;
+constexpr auto const UsPerSec = 1.e6;
 
 #endif // __TIMEUTIL_H__
