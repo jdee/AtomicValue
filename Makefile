@@ -25,6 +25,7 @@ clean:
 
 src/benchmark.o: Makefile \
 	include/AtomicValue/AtomicValue.h \
+	include/Bare.h \
 	include/log.h \
 	include/timeutil.h \
 	include/Metadata.h \

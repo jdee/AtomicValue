@@ -7,12 +7,19 @@ template <class> class FastAtomicReader;
 template <class> class FastAtomicWriter;
 }
 
+template <class> class Bare;
 template <class> class MutexWrapper;
 template <class> class MySTLAtomic;
 
 template <template <class> class>
 struct Metadata
 {
+};
+
+template <>
+struct Metadata<Bare>
+{
+    static constexpr const char* const testTitle = "unsynchronized";
 };
 
 template <>

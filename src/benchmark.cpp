@@ -4,6 +4,7 @@
 
 #include <AtomicValue/AtomicValue.h>
 
+#include "Bare.h"
 #include "MutexWrapper.h"
 #include "MySTLAtomic.h"
 #include "TestLoop.h"
@@ -44,6 +45,7 @@ main(int argc, char** argv)
 
         auto const iterations(100);
 
+        TestLoop<Bare, iterations>::loop(maxCount);
         TestLoop<FastAtomicReader, iterations>::loop(maxCount);
         TestLoop<FastAtomicWriter, iterations>::loop(maxCount);
         TestLoop<MySTLAtomic, iterations>::loop(maxCount);
