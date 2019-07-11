@@ -43,13 +43,13 @@ TestLoop
 #endif // DEBUG
 
         auto const elapsed(end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / UsPerSec);
-        auto const rate(counter / elapsed);
 
         LOG("done ✅");
         LOG("final counter value: " << counter);
         LOG("time elapsed: " << elapsed << " s");
         if (elapsed > 0)
         {
+            auto const rate(counter / elapsed);
             // statistical errors
             auto const rateError(sqrt(1. * counter) / elapsed);
             auto const periodError(NsPerSec * rateError / rate / rate);
