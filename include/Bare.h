@@ -10,7 +10,7 @@ public:
     void operator++() volatile { ++m_data; }
     operator T() const volatile { return m_data; }
 private:
-    T m_data;
+    T volatile m_data;
 };
 
 #endif // __BARE_H__
