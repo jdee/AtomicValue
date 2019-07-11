@@ -2,8 +2,7 @@ CPPFLAGS=-Iinclude
 CXXFLAGS=-std=c++11
 
 # Release
-CPPFLAGS+=-Wall -Werror
-CXXFLAGS+=-O3
+CXXFLAGS+=-O3 -Wall -Werror
 
 # Debug
 # CPPFLAGS+=-DDEBUG
