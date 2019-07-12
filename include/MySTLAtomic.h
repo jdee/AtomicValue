@@ -10,7 +10,7 @@ public:
     typedef typename std::atomic<T> Base;
     MySTLAtomic(T t = T()) : Base(t) {}
     void operator=(T data) volatile { Base::operator=(data); }
-    MySTLAtomic& operator=(T data) { Base::operator=(data); return *this; }
+    MySTLAtomic& operator=(T data) { return Base::operator=(data); }
 };
 
 #endif // __MYSTLATOMIC_H__

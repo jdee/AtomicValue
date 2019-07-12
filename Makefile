@@ -18,7 +18,7 @@ benchmark: $(OBJECTS)
 	$(LINK.cc) $(OBJECTS) $(LOADLIBES) $(LDLIBS) -o $@
 
 check: all
-	./benchmark 1000000
+	./benchmark 10000
 
 clean:
 	$(RM) benchmark src/*.o
@@ -32,7 +32,8 @@ src/benchmark.o: Makefile \
 	include/MutexWrapper.h \
 	include/MySTLAtomic.h \
 	include/TestLoop.h \
-	include/static_assert.h
+	include/static_assert.h \
+	include/Accumulator.h
 
 src/log.o: Makefile \
 	include/log.h \

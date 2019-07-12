@@ -12,5 +12,6 @@ timestamp(const timeval& tv);
 
 constexpr auto const NsPerSec = 1.e9;
 constexpr auto const UsPerSec = 1.e6;
+constexpr auto const MsPerSec = 1.e3;
 
 #endif // __TIMEUTIL_H__

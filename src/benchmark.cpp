@@ -9,7 +9,6 @@
 #include "MySTLAtomic.h"
 #include "TestLoop.h"
 #include "log.h"
-#include "timeutil.h"
 
 using namespace AtomicValue;
 using namespace std;
@@ -20,10 +19,10 @@ using namespace std;
 #define BUILD_TYPE "Release"
 #endif // DEBUG
 
-unsigned long long
-getMaxCount(int argc, char** argv)
+static unsigned long long
+getLoopCount(int argc, char** argv)
 {
-    if (argc < 2) return 1000000000;
+    if (argc < 2) return 10000000;
     return max(0LL, atoll(argv[1]));
 }
 
@@ -39,17 +38,15 @@ main(int argc, char** argv)
         LOG("Volatile counters");
 #endif // VOLATILE_COUNTER
 
-        auto const maxCount(getMaxCount(argc, argv));
+        auto const loopCount(getLoopCount(argc, argv));
 
-        LOG("total loop count: " << maxCount);
+        LOG("loop count: " << loopCount);
 
-        constexpr auto const iterations(100);
-
-        TestLoop<Bare, iterations>::loop(maxCount);
-        TestLoop<FastAtomicReader, iterations>::loop(maxCount);
-        TestLoop<FastAtomicWriter, iterations>::loop(maxCount);
-        TestLoop<MySTLAtomic, iterations>::loop(maxCount);
-        TestLoop<MutexWrapper, iterations>::loop(maxCount);
+        TestLoop<Bare>::loop(loopCount);
+        TestLoop<FastAtomicReader>::loop(loopCount);
+        TestLoop<FastAtomicWriter>::loop(loopCount);
+        TestLoop<MySTLAtomic>::loop(loopCount);
+        TestLoop<MutexWrapper>::loop(loopCount);
 
         return 0;
     }
