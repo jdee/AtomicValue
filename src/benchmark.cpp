@@ -23,7 +23,7 @@ using namespace std;
 unsigned long long
 getMaxCount(int argc, char** argv)
 {
-    if (argc < 2) return 10000000000;
+    if (argc < 2) return 1000000000;
     return max(0LL, atoll(argv[1]));
 }
 
@@ -43,7 +43,7 @@ main(int argc, char** argv)
 
         LOG("total loop count: " << maxCount);
 
-        auto const iterations(100);
+        constexpr auto const iterations(100);
 
         TestLoop<Bare, iterations>::loop(maxCount);
         TestLoop<FastAtomicReader, iterations>::loop(maxCount);

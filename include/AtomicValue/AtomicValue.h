@@ -145,7 +145,7 @@ public:
             ++ loopCount;
         }
 
-        if (m_exiting) return *this;
+        if (m_exiting) return;
 
         // prevent other writers from colliding, at least
         ++ m_lockCounter;

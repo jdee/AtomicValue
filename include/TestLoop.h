@@ -1,6 +1,7 @@
 #ifndef __TESTLOOP_H__
 #define __TESTLOOP_H__
 
+#include <cassert>
 #include <cmath>
 
 #include "Metadata.h"
@@ -22,6 +23,7 @@ TestLoop
 
     static void loop(unsigned long long totalLoops)
     {
+        assert(totalLoops > 0 && totalLoops % iterations == 0);
         auto const loopCount(totalLoops/iterations);
 
         LOG("#####");
@@ -33,7 +35,7 @@ TestLoop
         double totalSquare(0);
         for (unsigned int i=0; i<iterations; ++i)
         {
-            auto const elapsed(run(loopCount));
+            auto const elapsed(runIteration(loopCount));
             totalTime += elapsed;
             totalSquare += elapsed * elapsed;
         }
@@ -48,6 +50,11 @@ TestLoop
             auto const meanTime(totalTime / iterations);
             // RMS deviation
             auto const rmsTime(sqrt(totalSquare / iterations - meanTime * meanTime));
+
+            // Can't compute SD without at least 2 iterations because of the
+            // denominator on the next line.
+            STATIC_ASSERT(iterations > 1, iterations_must_be_gt_1);
+
             // SD/RMS
             auto const sdRatio(sqrt(1.*iterations/(iterations-1)));
             // standard deviation
@@ -71,7 +78,7 @@ TestLoop
     }
 
 protected:
-    static double run(unsigned long long maxCount)
+    static double runIteration(unsigned long long maxCount)
     {
         Counter_t VOLATILE counter;
         auto const start(currentTime());
