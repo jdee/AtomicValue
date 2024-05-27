@@ -16,7 +16,7 @@ timestamp(const timeval& tv)
     strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", &tm_time);
 
     char decimal[8];
-    sprintf(decimal, ".%06ld", long(tv.tv_usec));
+    snprintf(decimal, 8, ".%06ld", long(tv.tv_usec));
     strcat(buffer, decimal);
     return buffer;
 }
